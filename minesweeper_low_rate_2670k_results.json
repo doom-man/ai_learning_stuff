@@ -40,33 +40,87 @@
         }
       },
       "combined_wins": 1481
+    },
+    {
+      "wins": 717,
+      "games": 1000,
+      "win_rate": 0.717,
+      "mean_safe_revealed": 57.928,
+      "failure_diagnostics": {
+        "safe_move_available": 89,
+        "selected_provable_mine": 39,
+        "failed_games": 283
+      },
+      "second": {
+        "wins": 748,
+        "games": 1000,
+        "win_rate": 0.748,
+        "mean_safe_revealed": 60.469,
+        "failure_diagnostics": {
+          "safe_move_available": 83,
+          "selected_provable_mine": 42,
+          "failed_games": 252
+        }
+      },
+      "combined_wins": 1465,
+      "updates": 2420000,
+      "failed_training_games": 331973,
+      "replay_states": 2968797,
+      "priority_cases": 26791
+    },
+    {
+      "wins": 715,
+      "games": 1000,
+      "win_rate": 0.715,
+      "mean_safe_revealed": 57.925,
+      "failure_diagnostics": {
+        "safe_move_available": 84,
+        "selected_provable_mine": 43,
+        "failed_games": 285
+      },
+      "second": {
+        "wins": 767,
+        "games": 1000,
+        "win_rate": 0.767,
+        "mean_safe_revealed": 62.011,
+        "failure_diagnostics": {
+          "safe_move_available": 82,
+          "selected_provable_mine": 44,
+          "failed_games": 233
+        }
+      },
+      "combined_wins": 1482,
+      "updates": 2470000,
+      "failed_training_games": 340285,
+      "replay_states": 3028648,
+      "priority_cases": 29192
     }
   ],
   "best": {
-    "wins": 735,
+    "wins": 715,
     "games": 1000,
-    "win_rate": 0.735,
-    "mean_safe_revealed": 58.61,
+    "win_rate": 0.715,
+    "mean_safe_revealed": 57.925,
     "failure_diagnostics": {
-      "safe_move_available": 73,
-      "selected_provable_mine": 36,
-      "failed_games": 265
+      "safe_move_available": 84,
+      "selected_provable_mine": 43,
+      "failed_games": 285
     },
-    "updates": 2370000,
-    "failed_training_games": 323631,
-    "replay_states": 2906868,
-    "priority_cases": 24283,
     "second": {
-      "wins": 746,
+      "wins": 767,
       "games": 1000,
-      "win_rate": 0.746,
-      "mean_safe_revealed": 59.852,
+      "win_rate": 0.767,
+      "mean_safe_revealed": 62.011,
       "failure_diagnostics": {
-        "safe_move_available": 84,
-        "selected_provable_mine": 37,
-        "failed_games": 254
+        "safe_move_available": 82,
+        "selected_provable_mine": 44,
+        "failed_games": 233
       }
     },
-    "combined_wins": 1481
+    "combined_wins": 1482,
+    "updates": 2470000,
+    "failed_training_games": 340285,
+    "replay_states": 3028648,
+    "priority_cases": 29192
   }
 }
