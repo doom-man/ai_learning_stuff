@@ -1,0 +1,236 @@
+{
+  "seed": 2026,
+  "batch_size": 32,
+  "replay_per_batch": 16,
+  "self_play_interval": 100,
+  "self_play_games_per_round": 32,
+  "evaluation_games": 1000,
+  "checkpoints": [
+    {
+      "wins": 686,
+      "games": 1000,
+      "win_rate": 0.686,
+      "mean_safe_revealed": 59.617,
+      "updates": 1400000,
+      "failed_training_games": 195885,
+      "replay_states": 1880101
+    },
+    {
+      "wins": 664,
+      "games": 1000,
+      "win_rate": 0.664,
+      "mean_safe_revealed": 57.96,
+      "updates": 1450000,
+      "failed_training_games": 201064,
+      "replay_states": 1925547
+    },
+    {
+      "wins": 646,
+      "games": 1000,
+      "win_rate": 0.646,
+      "mean_safe_revealed": 56.515,
+      "updates": 1500000,
+      "failed_training_games": 206095,
+      "replay_states": 1968810
+    },
+    {
+      "wins": 676,
+      "games": 1000,
+      "win_rate": 0.676,
+      "mean_safe_revealed": 58.599,
+      "failure_diagnostics": {
+        "safe_move_available": 157,
+        "selected_provable_mine": 80,
+        "failed_games": 324
+      },
+      "updates": 1550000,
+      "failed_training_games": 211194,
+      "replay_states": 2011301
+    },
+    {
+      "wins": 663,
+      "games": 1000,
+      "win_rate": 0.663,
+      "mean_safe_revealed": 57.16,
+      "failure_diagnostics": {
+        "safe_move_available": 142,
+        "selected_provable_mine": 65,
+        "failed_games": 337
+      },
+      "updates": 1600000,
+      "failed_training_games": 216312,
+      "replay_states": 2054972
+    },
+    {
+      "wins": 699,
+      "games": 1000,
+      "win_rate": 0.699,
+      "mean_safe_revealed": 59.621,
+      "failure_diagnostics": {
+        "safe_move_available": 145,
+        "selected_provable_mine": 75,
+        "failed_games": 301
+      },
+      "updates": 1650000,
+      "failed_training_games": 221368,
+      "replay_states": 2097772
+    },
+    {
+      "wins": 694,
+      "games": 1000,
+      "win_rate": 0.694,
+      "mean_safe_revealed": 59.079,
+      "failure_diagnostics": {
+        "safe_move_available": 144,
+        "selected_provable_mine": 75,
+        "failed_games": 306
+      },
+      "updates": 1700000,
+      "failed_training_games": 226409,
+      "replay_states": 2140571
+    },
+    {
+      "wins": 677,
+      "games": 1000,
+      "win_rate": 0.677,
+      "mean_safe_revealed": 58.129,
+      "failure_diagnostics": {
+        "safe_move_available": 141,
+        "selected_provable_mine": 77,
+        "failed_games": 323
+      },
+      "updates": 1750000,
+      "failed_training_games": 231464,
+      "replay_states": 2183555
+    },
+    {
+      "wins": 670,
+      "games": 1000,
+      "win_rate": 0.67,
+      "mean_safe_revealed": 57.987,
+      "failure_diagnostics": {
+        "safe_move_available": 142,
+        "selected_provable_mine": 75,
+        "failed_games": 330
+      },
+      "updates": 1800000,
+      "failed_training_games": 236439,
+      "replay_states": 2224600
+    },
+    {
+      "wins": 676,
+      "games": 1000,
+      "win_rate": 0.676,
+      "mean_safe_revealed": 57.498,
+      "failure_diagnostics": {
+        "safe_move_available": 133,
+        "selected_provable_mine": 68,
+        "failed_games": 324
+      },
+      "updates": 1850000,
+      "failed_training_games": 241451,
+      "replay_states": 2267930
+    },
+    {
+      "wins": 690,
+      "games": 1000,
+      "win_rate": 0.69,
+      "mean_safe_revealed": 58.57,
+      "failure_diagnostics": {
+        "safe_move_available": 128,
+        "selected_provable_mine": 60,
+        "failed_games": 310
+      },
+      "updates": 1900000,
+      "failed_training_games": 246439,
+      "replay_states": 2309511
+    },
+    {
+      "wins": 708,
+      "games": 1000,
+      "win_rate": 0.708,
+      "mean_safe_revealed": 59.674,
+      "failure_diagnostics": {
+        "safe_move_available": 134,
+        "selected_provable_mine": 70,
+        "failed_games": 292
+      },
+      "updates": 1950000,
+      "failed_training_games": 251369,
+      "replay_states": 2351035
+    },
+    {
+      "wins": 682,
+      "games": 1000,
+      "win_rate": 0.682,
+      "mean_safe_revealed": 57.77,
+      "failure_diagnostics": {
+        "safe_move_available": 126,
+        "selected_provable_mine": 62,
+        "failed_games": 318
+      },
+      "updates": 2000000,
+      "failed_training_games": 256278,
+      "replay_states": 2392427
+    }
+  ],
+  "starting_checkpoint": "/Users/chenglong.ma/Documents/ai\u5b66\u4e60/minesweeper_finetune_best.npz",
+  "learning_rate": 0.00025,
+  "previous_learning_rate": 0.0005,
+  "starting_model_update": 1400000,
+  "starting_replay_update": 1400000,
+  "adam_reset_at_start": false,
+  "pytorch_cpu_threads": 12,
+  "pytorch_from_update": 1400001,
+  "plateau": {
+    "status": "reached",
+    "start_update": 1400000,
+    "evaluation_interval": 50000,
+    "minimum_gain_wins": 10,
+    "patience_evaluations": 3,
+    "anchor_wins": 686,
+    "evaluations_without_gain": 3,
+    "best": {
+      "wins": 686,
+      "games": 1000,
+      "win_rate": 0.686,
+      "mean_safe_revealed": 59.617,
+      "updates": 1400000,
+      "failed_training_games": 195885,
+      "replay_states": 1880101
+    },
+    "stop_update": 1550000
+  },
+  "fixed_run": {
+    "start_update": 1550000,
+    "end_update": 2000000,
+    "baseline": {
+      "wins": 676,
+      "games": 1000,
+      "win_rate": 0.676,
+      "mean_safe_revealed": 58.599,
+      "failure_diagnostics": {
+        "safe_move_available": 157,
+        "selected_provable_mine": 80,
+        "failed_games": 324
+      },
+      "updates": 1550000,
+      "failed_training_games": 211194,
+      "replay_states": 2011301
+    }
+  },
+  "best": {
+    "wins": 708,
+    "games": 1000,
+    "win_rate": 0.708,
+    "mean_safe_revealed": 59.674,
+    "failure_diagnostics": {
+      "safe_move_available": 134,
+      "selected_provable_mine": 70,
+      "failed_games": 292
+    },
+    "updates": 1950000,
+    "failed_training_games": 251369,
+    "replay_states": 2351035
+  }
+}

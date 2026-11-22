@@ -1,0 +1,283 @@
+{
+  "start": 2070000,
+  "end": 2370000,
+  "evaluation_interval": 50000,
+  "original_board_seed": 2026,
+  "original_board_spawn_index": 2,
+  "fresh_per_batch": 16,
+  "replay_per_batch": 10,
+  "priority_per_batch": 6,
+  "games_per_round": 64,
+  "self_play_interval": 100,
+  "control_continuation": "minesweeper_priority_checkpoint.npz",
+  "required_consecutive_leads": 2,
+  "holdout_seed": 207237,
+  "groups": {
+    "0.0001": {
+      "source": "minesweeper_priority_best.npz",
+      "learning_rate": 0.0001,
+      "cpu_threads": 12,
+      "checkpoints": [
+        {
+          "wins": 723,
+          "games": 1000,
+          "win_rate": 0.723,
+          "mean_safe_revealed": 58.319,
+          "failure_diagnostics": {
+            "safe_move_available": 91,
+            "selected_provable_mine": 47,
+            "failed_games": 277
+          },
+          "updates": 2070000,
+          "failed_training_games": 272413,
+          "replay_states": 2521682,
+          "priority_cases": 7351
+        },
+        {
+          "wins": 718,
+          "games": 1000,
+          "win_rate": 0.718,
+          "mean_safe_revealed": 58.62,
+          "failure_diagnostics": {
+            "safe_move_available": 95,
+            "selected_provable_mine": 46,
+            "failed_games": 282
+          },
+          "updates": 2120000,
+          "failed_training_games": 281321,
+          "replay_states": 2591408,
+          "priority_cases": 10529
+        },
+        {
+          "wins": 708,
+          "games": 1000,
+          "win_rate": 0.708,
+          "mean_safe_revealed": 57.264,
+          "failure_diagnostics": {
+            "safe_move_available": 90,
+            "selected_provable_mine": 48,
+            "failed_games": 292
+          },
+          "updates": 2170000,
+          "failed_training_games": 290090,
+          "replay_states": 2658803,
+          "priority_cases": 13574
+        },
+        {
+          "wins": 707,
+          "games": 1000,
+          "win_rate": 0.707,
+          "mean_safe_revealed": 57.561,
+          "failure_diagnostics": {
+            "safe_move_available": 89,
+            "selected_provable_mine": 41,
+            "failed_games": 293
+          },
+          "updates": 2220000,
+          "failed_training_games": 298791,
+          "replay_states": 2724253,
+          "priority_cases": 16478
+        },
+        {
+          "wins": 707,
+          "games": 1000,
+          "win_rate": 0.707,
+          "mean_safe_revealed": 57.123,
+          "failure_diagnostics": {
+            "safe_move_available": 83,
+            "selected_provable_mine": 40,
+            "failed_games": 293
+          },
+          "updates": 2270000,
+          "failed_training_games": 307322,
+          "replay_states": 2787255,
+          "priority_cases": 19159
+        },
+        {
+          "wins": 723,
+          "games": 1000,
+          "win_rate": 0.723,
+          "mean_safe_revealed": 58.516,
+          "failure_diagnostics": {
+            "safe_move_available": 88,
+            "selected_provable_mine": 40,
+            "failed_games": 277
+          },
+          "updates": 2320000,
+          "failed_training_games": 315796,
+          "replay_states": 2849674,
+          "priority_cases": 21779
+        },
+        {
+          "wins": 721,
+          "games": 1000,
+          "win_rate": 0.721,
+          "mean_safe_revealed": 58.141,
+          "failure_diagnostics": {
+            "safe_move_available": 85,
+            "selected_provable_mine": 37,
+            "failed_games": 279
+          },
+          "updates": 2370000,
+          "failed_training_games": 324184,
+          "replay_states": 2910665,
+          "priority_cases": 24297
+        }
+      ],
+      "best": {
+        "wins": 723,
+        "games": 1000,
+        "win_rate": 0.723,
+        "mean_safe_revealed": 58.319,
+        "failure_diagnostics": {
+          "safe_move_available": 91,
+          "selected_provable_mine": 47,
+          "failed_games": 277
+        },
+        "updates": 2070000,
+        "failed_training_games": 272413,
+        "replay_states": 2521682,
+        "priority_cases": 7351
+      }
+    },
+    "5e-05": {
+      "source": "minesweeper_priority_best.npz",
+      "learning_rate": 5e-05,
+      "cpu_threads": 12,
+      "checkpoints": [
+        {
+          "wins": 723,
+          "games": 1000,
+          "win_rate": 0.723,
+          "mean_safe_revealed": 58.319,
+          "failure_diagnostics": {
+            "safe_move_available": 91,
+            "selected_provable_mine": 47,
+            "failed_games": 277
+          },
+          "updates": 2070000,
+          "failed_training_games": 272413,
+          "replay_states": 2521682,
+          "priority_cases": 7351
+        },
+        {
+          "wins": 711,
+          "games": 1000,
+          "win_rate": 0.711,
+          "mean_safe_revealed": 57.558,
+          "failure_diagnostics": {
+            "safe_move_available": 88,
+            "selected_provable_mine": 41,
+            "failed_games": 289
+          },
+          "updates": 2120000,
+          "failed_training_games": 281200,
+          "replay_states": 2590703,
+          "priority_cases": 10524
+        },
+        {
+          "wins": 728,
+          "games": 1000,
+          "win_rate": 0.728,
+          "mean_safe_revealed": 59.054,
+          "failure_diagnostics": {
+            "safe_move_available": 89,
+            "selected_provable_mine": 48,
+            "failed_games": 272
+          },
+          "updates": 2170000,
+          "failed_training_games": 290018,
+          "replay_states": 2659139,
+          "priority_cases": 13619
+        },
+        {
+          "wins": 735,
+          "games": 1000,
+          "win_rate": 0.735,
+          "mean_safe_revealed": 59.54,
+          "failure_diagnostics": {
+            "safe_move_available": 85,
+            "selected_provable_mine": 41,
+            "failed_games": 265
+          },
+          "updates": 2220000,
+          "failed_training_games": 298524,
+          "replay_states": 2722129,
+          "priority_cases": 16382
+        },
+        {
+          "wins": 733,
+          "games": 1000,
+          "win_rate": 0.733,
+          "mean_safe_revealed": 58.551,
+          "failure_diagnostics": {
+            "safe_move_available": 75,
+            "selected_provable_mine": 41,
+            "failed_games": 267
+          },
+          "updates": 2270000,
+          "failed_training_games": 306919,
+          "replay_states": 2785305,
+          "priority_cases": 19107
+        },
+        {
+          "wins": 731,
+          "games": 1000,
+          "win_rate": 0.731,
+          "mean_safe_revealed": 58.891,
+          "failure_diagnostics": {
+            "safe_move_available": 83,
+            "selected_provable_mine": 38,
+            "failed_games": 269
+          },
+          "updates": 2320000,
+          "failed_training_games": 315263,
+          "replay_states": 2846368,
+          "priority_cases": 21719
+        },
+        {
+          "wins": 735,
+          "games": 1000,
+          "win_rate": 0.735,
+          "mean_safe_revealed": 58.61,
+          "failure_diagnostics": {
+            "safe_move_available": 73,
+            "selected_provable_mine": 36,
+            "failed_games": 265
+          },
+          "updates": 2370000,
+          "failed_training_games": 323631,
+          "replay_states": 2906868,
+          "priority_cases": 24283
+        }
+      ],
+      "best": {
+        "wins": 735,
+        "games": 1000,
+        "win_rate": 0.735,
+        "mean_safe_revealed": 59.54,
+        "failure_diagnostics": {
+          "safe_move_available": 85,
+          "selected_provable_mine": 41,
+          "failed_games": 265
+        },
+        "updates": 2220000,
+        "failed_training_games": 298524,
+        "replay_states": 2722129,
+        "priority_cases": 16382
+      }
+    }
+  },
+  "holdout_triggered": true,
+  "holdout": {
+    "seed": 207237,
+    "games": 1000,
+    "wins": {
+      "baseline": 724,
+      "0.0001": 771,
+      "5e-05": 746
+    },
+    "low_only": 108,
+    "high_only": 133
+  }
+}

@@ -1,0 +1,81 @@
+{
+  "seed": 2026,
+  "batch_size": 32,
+  "replay_per_batch": 16,
+  "self_play_interval": 100,
+  "self_play_games_per_round": 32,
+  "evaluation_games": 1000,
+  "checkpoints": [
+    {
+      "wins": 667,
+      "games": 1000,
+      "win_rate": 0.667,
+      "mean_safe_revealed": 58.867,
+      "updates": 1200000,
+      "failed_training_games": 174722,
+      "replay_states": 1692621
+    },
+    {
+      "wins": 678,
+      "games": 1000,
+      "win_rate": 0.678,
+      "mean_safe_revealed": 58.783,
+      "updates": 1250000,
+      "failed_training_games": 180088,
+      "replay_states": 1740642
+    },
+    {
+      "wins": 638,
+      "games": 1000,
+      "win_rate": 0.638,
+      "mean_safe_revealed": 57.632,
+      "updates": 1300000,
+      "failed_training_games": 185404,
+      "replay_states": 1788231
+    },
+    {
+      "wins": 673,
+      "games": 1000,
+      "win_rate": 0.673,
+      "mean_safe_revealed": 58.22,
+      "updates": 1350000,
+      "failed_training_games": 190566,
+      "replay_states": 1833935
+    },
+    {
+      "wins": 686,
+      "games": 1000,
+      "win_rate": 0.686,
+      "mean_safe_revealed": 59.617,
+      "updates": 1400000,
+      "failed_training_games": 195885,
+      "replay_states": 1880101
+    }
+  ],
+  "learning_rate": 0.0005,
+  "previous_learning_rate": 0.001,
+  "starting_model_update": 1200000,
+  "starting_replay_update": 1250000,
+  "adam_reset_at_start": true,
+  "pytorch_cpu_threads": 12,
+  "pytorch_from_update": 1200001,
+  "plateau": {
+    "status": "reached",
+    "start_update": 1200000,
+    "evaluation_interval": 50000,
+    "minimum_gain_wins": 10,
+    "patience_evaluations": 3,
+    "anchor_wins": 678,
+    "evaluations_without_gain": 3,
+    "best": {
+      "wins": 686,
+      "games": 1000,
+      "win_rate": 0.686,
+      "mean_safe_revealed": 59.617,
+      "updates": 1400000,
+      "failed_training_games": 195885,
+      "replay_states": 1880101
+    },
+    "stop_update": 1400000
+  }
+}

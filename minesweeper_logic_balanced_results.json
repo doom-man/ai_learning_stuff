@@ -1,0 +1,173 @@
+{
+  "source": "minesweeper_finetune_lr0.00025_best.npz",
+  "seed": 2026,
+  "learning_rate": 0.0001,
+  "cpu_threads": 12,
+  "rule_examples_per_batch": 8,
+  "rule_loss_weight": 0.1,
+  "rank_against": "actual_mines",
+  "checkpoints": [
+    {
+      "wins": 708,
+      "games": 1000,
+      "win_rate": 0.708,
+      "mean_safe_revealed": 59.674,
+      "failure_diagnostics": {
+        "safe_move_available": 134,
+        "selected_provable_mine": 70,
+        "failed_games": 292
+      },
+      "updates": 1950000,
+      "failed_training_games": 251369,
+      "replay_states": 2351035,
+      "forced_choice": {
+        "cases": 1000,
+        "selected_provably_safe": 893,
+        "selected_actual_mine": 1,
+        "selected_provable_mine": 0
+      },
+      "historical_failures": {
+        "cases": 126,
+        "selected_provably_safe": 38,
+        "selected_actual_mine": 73,
+        "selected_provable_mine": 40
+      },
+      "corner_examples": {
+        "cases": 8,
+        "selected_provably_safe": 0,
+        "selected_actual_mine": 0,
+        "selected_provable_mine": 0
+      }
+    },
+    {
+      "wins": 685,
+      "games": 1000,
+      "win_rate": 0.685,
+      "mean_safe_revealed": 57.866,
+      "failure_diagnostics": {
+        "safe_move_available": 128,
+        "selected_provable_mine": 61,
+        "failed_games": 315
+      },
+      "updates": 1955000,
+      "failed_training_games": 251856,
+      "replay_states": 2355006,
+      "forced_choice": {
+        "cases": 1000,
+        "selected_provably_safe": 900,
+        "selected_actual_mine": 1,
+        "selected_provable_mine": 0
+      },
+      "historical_failures": {
+        "cases": 126,
+        "selected_provably_safe": 49,
+        "selected_actual_mine": 60,
+        "selected_provable_mine": 32
+      },
+      "corner_examples": {
+        "cases": 8,
+        "selected_provably_safe": 0,
+        "selected_actual_mine": 0,
+        "selected_provable_mine": 0
+      }
+    },
+    {
+      "wins": 669,
+      "games": 1000,
+      "win_rate": 0.669,
+      "mean_safe_revealed": 57.397,
+      "failure_diagnostics": {
+        "safe_move_available": 135,
+        "selected_provable_mine": 70,
+        "failed_games": 331
+      },
+      "updates": 1960000,
+      "failed_training_games": 252377,
+      "replay_states": 2359412,
+      "forced_choice": {
+        "cases": 1000,
+        "selected_provably_safe": 900,
+        "selected_actual_mine": 1,
+        "selected_provable_mine": 0
+      },
+      "historical_failures": {
+        "cases": 126,
+        "selected_provably_safe": 55,
+        "selected_actual_mine": 53,
+        "selected_provable_mine": 31
+      },
+      "corner_examples": {
+        "cases": 8,
+        "selected_provably_safe": 0,
+        "selected_actual_mine": 1,
+        "selected_provable_mine": 0
+      }
+    },
+    {
+      "wins": 709,
+      "games": 1000,
+      "win_rate": 0.709,
+      "mean_safe_revealed": 59.272,
+      "failure_diagnostics": {
+        "safe_move_available": 128,
+        "selected_provable_mine": 68,
+        "failed_games": 291
+      },
+      "updates": 1970000,
+      "failed_training_games": 253369,
+      "replay_states": 2367312,
+      "forced_choice": {
+        "cases": 1000,
+        "selected_provably_safe": 895,
+        "selected_actual_mine": 1,
+        "selected_provable_mine": 0
+      },
+      "historical_failures": {
+        "cases": 126,
+        "selected_provably_safe": 49,
+        "selected_actual_mine": 56,
+        "selected_provable_mine": 33
+      },
+      "corner_examples": {
+        "cases": 8,
+        "selected_provably_safe": 0,
+        "selected_actual_mine": 1,
+        "selected_provable_mine": 0
+      }
+    }
+  ],
+  "best": {
+    "wins": 709,
+    "games": 1000,
+    "win_rate": 0.709,
+    "mean_safe_revealed": 59.272,
+    "failure_diagnostics": {
+      "safe_move_available": 128,
+      "selected_provable_mine": 68,
+      "failed_games": 291
+    },
+    "updates": 1970000,
+    "failed_training_games": 253369,
+    "replay_states": 2367312,
+    "forced_choice": {
+      "cases": 1000,
+      "selected_provably_safe": 895,
+      "selected_actual_mine": 1,
+      "selected_provable_mine": 0
+    },
+    "historical_failures": {
+      "cases": 126,
+      "selected_provably_safe": 49,
+      "selected_actual_mine": 56,
+      "selected_provable_mine": 33
+    },
+    "corner_examples": {
+      "cases": 8,
+      "selected_provably_safe": 0,
+      "selected_actual_mine": 1,
+      "selected_provable_mine": 0
+    }
+  },
+  "training_rule_states": 38876,
+  "training_hard_states": 594
+}

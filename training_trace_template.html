@@ -1,0 +1,739 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>扫雷模型训练回放</title>
+  <style>
+    :root {
+      color-scheme: light;
+      font-family: system-ui, "PingFang SC", "Microsoft YaHei", sans-serif;
+      color: #192638;
+      background: #f4f6fa;
+      --muted: #526173;
+      --border: #dce3ec;
+      --forward: #096c63;
+      --backward: #6a3ca2;
+      --blue: #2458bc;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; }
+    main { max-width: 1140px; margin: auto; padding: 32px 24px 52px; }
+    h1, h2, h3, p { margin: 0; }
+    h1 { font-size: clamp(1.6rem, 4vw, 2.25rem); margin-bottom: 18px; }
+    h2 { font-size: 1.15rem; }
+    h3 { font-size: 0.96rem; }
+    code, output, .value { font-variant-numeric: tabular-nums; }
+    .panel {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 18px;
+    }
+    .controls, .position, .buttons { display: flex; align-items: center; gap: 8px; }
+    .controls { flex-wrap: wrap; gap: 12px; }
+    .position { flex: 1 1 245px; }
+    input[type="range"] { flex: 1; min-width: 80px; accent-color: var(--blue); }
+    button {
+      padding: 6px 12px;
+      color: #192638;
+      background: white;
+      border: 1px solid #b8c5d6;
+      border-radius: 6px;
+      font: inherit;
+      cursor: pointer;
+    }
+    button:hover:enabled { background: #edf3ff; }
+    button:disabled { opacity: .45; cursor: default; }
+    button:focus-visible, input:focus-visible { outline: 2px solid var(--blue); outline-offset: 3px; }
+    .loss-header {
+      display: flex;
+      gap: 8px;
+      align-items: baseline;
+      justify-content: space-between;
+      margin-top: 16px;
+      font-size: .9rem;
+    }
+    .loss-header output { color: var(--blue); font-weight: 700; }
+    canvas { display: block; width: 100%; }
+    #loss-chart { height: 104px; }
+    .training-detail {
+      display: grid;
+      grid-template-columns: 350px minmax(0, 1fr);
+      align-items: start;
+      gap: 14px;
+      margin-top: 14px;
+    }
+    .updates { margin-top: 14px; }
+    .training-board {
+      display: grid;
+      grid-template-columns: repeat(9, minmax(0, 1fr));
+      gap: 3px;
+      max-width: 330px;
+      margin: 12px 0;
+    }
+    .square {
+      display: grid;
+      place-items: center;
+      aspect-ratio: 1;
+      border: 1px solid #dce3ec;
+      border-radius: 4px;
+      background: #f8fafc;
+      color: #2458bc;
+      font: 700 .84rem ui-monospace, monospace;
+    }
+    .square[data-state="0"] { color: #586b80; }
+    .square[data-state="unknown"] { background: #e6edf5; color: #526173; }
+    .square[data-state="mine"] { background: #fce9e8; color: #ab302d; border-color: #e9bbb9; }
+    .training-board .square {
+      grid-template-rows: minmax(0, 1fr) auto;
+      gap: 1px;
+      min-width: 0;
+      padding: 2px 0 3px;
+      line-height: 1;
+    }
+    .square-probability {
+      font-size: clamp(.47rem, 1.15vw, .65rem);
+      font-weight: 600;
+      color: #233952;
+      white-space: nowrap;
+    }
+    .board-key { display: grid; gap: 5px; list-style: none; padding: 0; margin: 12px 0; font-size: .8rem; }
+    .board-key li { display: flex; align-items: center; gap: 7px; }
+    .board-key .square { width: 19px; flex-shrink: 0; }
+    .network { --accent: var(--forward); --tint: #edf8f5; }
+    .network[data-direction="backward"] { --accent: var(--backward); --tint: #f6f0fc; }
+    .network-heading, .layer-heading {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+    .mode[aria-pressed="true"], .layer[aria-pressed="true"] {
+      border-color: var(--accent);
+      color: var(--accent);
+      background: var(--tint);
+    }
+    .hint { font-size: .82rem; color: var(--muted); margin-top: 5px; line-height: 1.55; }
+    .graph-scroll { overflow-x: auto; margin-top: 10px; }
+    .graph {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      justify-items: center;
+      position: relative;
+      min-width: 560px;
+      padding: 8px;
+    }
+    #edges {
+      position: absolute;
+      height: 100%;
+      inset: 0;
+      pointer-events: none;
+    }
+    .layer {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 7px 9px;
+      background: transparent;
+      border: 1px solid transparent;
+      min-width: 96px;
+    }
+    .layer-size { font-size: .75rem; color: var(--muted); }
+    .nodes {
+      display: grid;
+      place-items: center;
+      align-content: center;
+      gap: 9px;
+      height: 120px;
+      margin-top: 4px;
+    }
+    .node {
+      display: grid;
+      place-items: center;
+      width: 72px;
+      height: 27px;
+      border: 1px solid #aebbc9;
+      border-radius: 99px;
+      background: white;
+      color: #192638;
+      font: .73rem ui-monospace, monospace;
+    }
+    .layer[aria-pressed="true"] .node { border-color: var(--accent); }
+    .layer-detail { border-top: 1px solid var(--border); margin-top: 8px; padding-top: 12px; }
+    .formula { font-size: .9rem; color: var(--accent); margin-top: 6px; line-height: 1.5; }
+    #values-chart { height: 55px; margin: 4px 0; cursor: crosshair; }
+    .unit-picker { display: flex; align-items: center; gap: 9px; flex-wrap: wrap; font-size: .84rem; }
+    .unit-picker[hidden] { display: none; }
+    .unit-picker input[type="number"] {
+      width: 76px;
+      border: 1px solid #b8c5d6;
+      border-radius: 5px;
+      padding: 4px 6px;
+      font: inherit;
+    }
+    .metrics { display: flex; gap: 8px; flex-wrap: wrap; margin: 8px 0 0; }
+    .metrics div { padding: 5px 8px; border-radius: 5px; background: var(--tint); font-size: .82rem; }
+    .metrics dt, .metrics dd { display: inline; }
+    .metrics dd { margin: 0 0 0 6px; font-weight: 600; font-variant-numeric: tabular-nums; }
+    table { width: 100%; font-size: .84rem; border-collapse: collapse; margin-top: 8px; }
+    th, td { border-bottom: 1px solid var(--border); padding: 6px 8px; text-align: left; }
+    tbody tr:last-child > * { border-bottom: 0; }
+    @media (max-width: 1020px) {
+      .training-detail { grid-template-columns: minmax(0, 1fr); }
+    }
+    @media (max-width: 700px) {
+      main { padding: 20px 12px 32px; }
+      .panel { padding: 14px; }
+      th, td { padding: 6px 3px; }
+    }
+  </style>
+</head>
+<body>
+  <main id="replay-guide">
+    <section class="panel">
+      <h1>扫雷模型训练回放</h1>
+      <p class="hint" id="replay-guide-message">这是页面模板。打开生成的回放即可查看 100 步的正向传播和反向传播。</p>
+      <p><a href="./training_trace.html">打开训练回放</a></p>
+      <noscript><p class="hint">回放需要 JavaScript。请用系统浏览器打开训练回放文件。</p></noscript>
+    </section>
+  </main>
+  <main id="replay" hidden>
+    <h1>扫雷模型训练回放</h1>
+    <section class="panel" aria-label="训练步选择和损失曲线">
+      <div class="controls">
+        <div class="buttons">
+          <button type="button" id="previous">上一步</button>
+          <button type="button" id="next">下一步</button>
+          <button type="button" id="play">播放</button>
+        </div>
+        <div class="position">
+          <label for="step">训练步</label>
+          <input id="step" type="range" min="1" value="1" step="1">
+          <output id="step-number" for="step"></output>
+        </div>
+      </div>
+      <div class="loss-header">
+        <span>每批次的训练损失</span>
+        <span>当前损失 <output id="loss-value" for="step"></output></span>
+      </div>
+      <canvas id="loss-chart" role="img" aria-label="训练损失曲线，圆点标出当前训练步"></canvas>
+    </section>
+
+    <div class="training-detail">
+      <section class="panel" aria-labelledby="board-title">
+        <h2 id="board-title">训练棋盘</h2>
+        <p class="hint" id="board-caption"></p>
+        <p class="hint">每格下方是模型预测的踩雷概率。选格时只考虑未知格。</p>
+        <div class="training-board" id="training-board" role="group" aria-label="9 × 9 扫雷棋盘及踩雷概率"></div>
+        <ul class="board-key" aria-label="棋盘图例">
+          <li><span class="square" aria-hidden="true">2</span>数字 0–8 表示相邻雷数</li>
+          <li><span class="square" data-state="unknown" aria-hidden="true">·</span>尚未翻开的未知格</li>
+          <li><span class="square" data-state="mine" aria-hidden="true">雷</span>地雷标签，显示答案时可见</li>
+        </ul>
+        <button type="button" id="show-mines" aria-pressed="false" aria-controls="training-board">显示雷区答案</button>
+      </section>
+
+      <section class="panel network" id="network" data-direction="forward">
+        <div class="network-heading">
+          <h2>传播网络</h2>
+          <div class="buttons" role="group" aria-label="传播方向">
+            <button class="mode" type="button" id="forward" aria-pressed="true">正向传播 →</button>
+            <button class="mode" type="button" id="backward" aria-pressed="false">← 反向传播</button>
+          </div>
+        </div>
+        <p class="hint">点击层或按「沿箭头下一层」查看这张棋盘的激活值和梯度。</p>
+        <div class="graph-scroll">
+          <div class="graph" id="graph" role="group" aria-label="训练网络各层">
+            <canvas id="edges" aria-hidden="true"></canvas>
+          </div>
+        </div>
+        <div class="layer-detail">
+          <div class="layer-heading">
+            <h3 id="layer-title"></h3>
+            <button type="button" id="next-layer">沿箭头下一层</button>
+          </div>
+          <p class="formula" id="layer-formula"></p>
+          <p class="hint" id="connection"></p>
+          <div id="signals">
+            <canvas id="values-chart" role="img" aria-label="本层各单元数值热图，可用下方编号选择单元"></canvas>
+            <div class="unit-picker">
+              <label for="unit">单元编号（从 0 开始）</label>
+              <input id="unit" type="number" min="0" step="1">
+              <span class="hint" id="value-range"></span>
+            </div>
+          </div>
+          <dl class="metrics" id="metrics"></dl>
+        </div>
+      </section>
+    </div>
+
+    <section class="panel updates">
+      <h2>Adam 参数更新</h2>
+      <p class="hint">整批参数梯度与每步参数变化量均用 L2 范数表示。</p>
+      <table>
+        <thead>
+          <tr><th scope="col">层</th><th scope="col">权重梯度</th><th scope="col">偏置梯度</th><th scope="col">权重变化量</th><th scope="col">偏置变化量</th></tr>
+        </thead>
+        <tbody id="updates"></tbody>
+      </table>
+    </section>
+  </main>
+
+  <script type="application/json" id="trace-data">[]</script>
+  <script>
+  function startReplay(traces) {
+    const slider = document.getElementById("step");
+    const stepNumber = document.getElementById("step-number");
+    const lossValue = document.getElementById("loss-value");
+    const chart = document.getElementById("loss-chart");
+    const trainingBoard = document.getElementById("training-board");
+    const boardCaption = document.getElementById("board-caption");
+    const showMines = document.getElementById("show-mines");
+    const forward = document.getElementById("forward");
+    const backward = document.getElementById("backward");
+    const network = document.getElementById("network");
+    const graph = document.getElementById("graph");
+    const edges = document.getElementById("edges");
+    const valuesChart = document.getElementById("values-chart");
+    const layerTitle = document.getElementById("layer-title");
+    const layerFormula = document.getElementById("layer-formula");
+    const connection = document.getElementById("connection");
+    const signals = document.getElementById("signals");
+    const unit = document.getElementById("unit");
+    const valueRange = document.getElementById("value-range");
+    const metrics = document.getElementById("metrics");
+    const nextLayer = document.getElementById("next-layer");
+    const updates = document.getElementById("updates");
+    const previous = document.getElementById("previous");
+    const next = document.getElementById("next");
+    const play = document.getElementById("play");
+    const losses = traces.map(trace => trace.loss);
+    const minLoss = Math.min(...losses);
+    const maxLoss = Math.max(...losses);
+    const lossPadding = Math.max((maxLoss - minLoss) * 0.1, 0.0001);
+    const layers = [
+      {
+        label: "输入层", example: "input", key: "X",
+        forward: "X 把棋盘上每格的数字 0–8 或未知状态编码为 10 个值。",
+        backward: "∂L/∂X = (∂L/∂Z1) · W1ᵀ。输入梯度仅用于回放。",
+      },
+      {
+        label: "隐藏层", example: "hidden", key: "A1", gradient: "Z1",
+        forward: "Z1 = X · W1 + b1，A1 = max(0, Z1)。",
+        backward: "∂L/∂A1 = (∂L/∂logits) · W2ᵀ。Z1 > 0 时梯度传给 Z1，其余置零。",
+      },
+      {
+        label: "输出层", example: "output", key: "logits",
+        forward: "logits = A1 · W2 + b2，sigmoid(logits) 把分数映射到 0–1。",
+        backward: "未知格的梯度 = (sigmoid(logits) − 标签) ÷ 整批未知格数。已翻开格的梯度为 0。",
+      },
+      {
+        label: "损失", key: null,
+        forward: "对整批未知格的预测和真实标签计算平均二元交叉熵。",
+        backward: "从本步的标量损失 L 开始反向传播，初始梯度 ∂L/∂L = 1。",
+      },
+    ];
+    const layerButtons = layers.map((layer, index) => {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "layer";
+      const size = layer.key ? traces[0].sample.activations[layer.key].length + " 个单元" : "二元交叉熵";
+      const dots = '<span class="node" aria-hidden="true"></span>'.repeat(layer.key ? 3 : 1);
+      button.innerHTML = `<strong>${layer.label}</strong><span class="layer-size">${size}</span><span class="nodes">${dots}</span>`;
+      button.addEventListener("click", () => selectLayer(index));
+      graph.append(button);
+      return button;
+    });
+    let currentStep = 1;
+    let selectedLayer = 0;
+    let selectedUnit = traces[0].sample.example.input;
+    let direction = "forward";
+    let timer = null;
+    let revealMines = false;
+    const boardSquares = traces[0].sample.unknown.map(() => {
+      const square = document.createElement("span");
+      square.className = "square";
+      const mark = document.createElement("span");
+      const probabilityLabel = document.createElement("span");
+      probabilityLabel.className = "square-probability";
+      square.append(mark, probabilityLabel);
+      return {square, mark, probabilityLabel};
+    });
+    trainingBoard.append(...boardSquares.map(({square}) => square));
+    slider.max = traces.length;
+
+    function mineProbability(logit) {
+      const clipped = Math.min(60, Math.max(-60, logit));
+      return 1 / (1 + Math.exp(-clipped));
+    }
+
+    function renderBoard(sample) {
+      boardCaption.textContent = `第 ${currentStep} 步 · 批次中的第一张棋盘`;
+      boardSquares.forEach(({square, mark, probabilityLabel}, index) => {
+        const mine = revealMines && sample.mines[index];
+        const unknown = sample.unknown[index];
+        const start = index * 10;
+        const clue = unknown ? null : sample.activations.X.slice(start, start + 9).indexOf(1);
+        const percent = mineProbability(sample.activations.logits[index]) * 100;
+        square.dataset.state = mine ? "mine" : unknown ? "unknown" : String(clue);
+        mark.textContent = mine ? "雷" : unknown ? "·" : String(clue);
+        probabilityLabel.textContent = `${Number(percent.toFixed(1))}%`;
+        const state = mine ? "地雷" : unknown ? "未知格" : `相邻 ${clue} 颗雷`;
+        square.title = `第 ${Math.floor(index / 9) + 1} 行，第 ${index % 9 + 1} 列：${state}，预测踩雷概率 ${percent.toFixed(2)}%`;
+      });
+    }
+
+    function number(value) {
+      if (value === 0) return "0";
+      return Math.abs(value) < 0.01 ? value.toExponential(3) : value.toFixed(4);
+    }
+
+    function signalKey(layer) {
+      return direction === "backward" ? (layer.gradient || layer.key) : layer.key;
+    }
+
+    function signalValues(layer) {
+      const sample = traces[currentStep - 1].sample;
+      return (direction === "backward" ? sample.gradients : sample.activations)[signalKey(layer)];
+    }
+
+    function drawEdges() {
+      const width = graph.clientWidth;
+      const height = graph.clientHeight;
+      const ratio = window.devicePixelRatio || 1;
+      edges.width = Math.round(width * ratio);
+      edges.height = Math.round(height * ratio);
+      const ctx = edges.getContext("2d");
+      ctx.scale(ratio, ratio);
+      const graphBox = graph.getBoundingClientRect();
+      const nodes = layerButtons.map(button => Array.from(button.querySelectorAll(".node"), dot => {
+        const box = dot.getBoundingClientRect();
+        return {
+          left: box.left - graphBox.left,
+          right: box.right - graphBox.left,
+          y: box.top + box.height / 2 - graphBox.top,
+        };
+      }));
+      const reverse = direction === "backward";
+      const activeEdge = reverse ? selectedLayer : selectedLayer - 1;
+      const accent = getComputedStyle(network).getPropertyValue("--accent").trim();
+
+      for (let i = 0; i < nodes.length - 1; i++) {
+        const left = nodes[i], right = nodes[i + 1];
+        const active = i === activeEdge;
+        ctx.strokeStyle = active ? accent : "#7b899c";
+        ctx.globalAlpha = active ? .48 : .3;
+        ctx.lineWidth = active ? 1.45 : 1;
+        ctx.beginPath();
+        for (const source of left) {
+          for (const target of right) {
+            ctx.moveTo(source.right, source.y);
+            ctx.lineTo(target.left, target.y);
+          }
+        }
+        ctx.stroke();
+
+        // 在两层之间标出当前传播方向。
+        const x = (left[0].right + right[0].left) / 2;
+        const y = left[Math.floor(left.length / 2)].y;
+        const sign = reverse ? -1 : 1;
+        ctx.globalAlpha = 1;
+        ctx.fillStyle = active ? accent : "#7b899c";
+        ctx.beginPath();
+        ctx.moveTo(x + 6 * sign, y);
+        ctx.lineTo(x - 4 * sign, y - 5);
+        ctx.lineTo(x - 4 * sign, y + 5);
+        ctx.closePath();
+        ctx.fill();
+      }
+    }
+
+    function connectionExample(trace) {
+      const {activations, gradients, example} = trace.sample;
+      const {input, hidden, output, w1, w2} = example;
+      const examples = direction === "forward" ? {
+        1: [`X[${input}] → Z1[${hidden}]`, activations.X[input], w1],
+        2: [`A1[${hidden}] → logits[${output}]`, activations.A1[hidden], w2],
+      } : {
+        0: [`∂L/∂Z1[${hidden}] → ∂L/∂X[${input}]`, gradients.Z1[hidden], w1],
+        1: [`∂L/∂logits[${output}] → ∂L/∂A1[${hidden}]`, gradients.logits[output], w2],
+      };
+      const exampleValues = examples[selectedLayer];
+      if (!exampleValues) return "";
+      const [label, signal, weight] = exampleValues;
+      return `示例连接 ${label}　信号 ${number(signal)} × 权重 ${number(weight)} ≈ ${number(signal * weight)}`;
+    }
+
+    function drawValues() {
+      const layer = layers[selectedLayer];
+      if (!layer.key) return;
+      const values = signalValues(layer);
+      const width = valuesChart.clientWidth, height = valuesChart.clientHeight;
+      if (!width || !height) return;
+      const ratio = window.devicePixelRatio || 1;
+      valuesChart.width = Math.round(width * ratio);
+      valuesChart.height = Math.round(height * ratio);
+      const ctx = valuesChart.getContext("2d");
+      ctx.scale(ratio, ratio);
+      const min = Math.min(...values), max = Math.max(...values);
+      const scale = Math.max(Math.abs(min), Math.abs(max)) || 1;
+      const cellWidth = width / values.length;
+      const positive = direction === "forward" ? "9,108,99" : "106,60,162";
+      ctx.fillStyle = "#eef1f5";
+      ctx.fillRect(0, 10, width, height - 20);
+      values.forEach((value, index) => {
+        if (value === 0) return;
+        const color = value > 0 ? positive : "184,73,32";
+        const alpha = .2 + .8 * Math.abs(value) / scale;
+        ctx.fillStyle = `rgba(${color},${alpha})`;
+        ctx.fillRect(index * cellWidth, 10, cellWidth, height - 20);
+      });
+      const marker = Math.min(width - 1, Math.max(1, (selectedUnit + .5) * cellWidth));
+      ctx.strokeStyle = "#192638";
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(marker, 4);
+      ctx.lineTo(marker, height - 4);
+      ctx.stroke();
+      const key = signalKey(layer);
+      const label = direction === "forward" ? key : "∂L/∂" + key;
+      valueRange.textContent = `${label} 热图 · 范围 ${number(min)} 至 ${number(max)} · 橙色为负，浅灰为零`;
+    }
+
+    function renderUnit() {
+      const trace = traces[currentStep - 1];
+      const layer = layers[selectedLayer];
+      const {activations, gradients, mines, unknown} = trace.sample;
+      const i = selectedUnit;
+      let rows;
+      if (!layer.key) {
+        rows = [["整批损失 L", trace.loss.toFixed(5)], ["整批未知格数", trace.unknown_count]];
+        if (direction === "backward") rows.push(["∂L/∂L", 1]);
+      } else if (selectedLayer === 0) {
+        const cell = Math.floor(i / 10);
+        const channel = i % 10;
+        rows = [
+          ["棋盘位置", `第 ${Math.floor(cell / 9) + 1} 行，第 ${cell % 9 + 1} 列`],
+          ["编码状态", channel === 9 ? "未知" : channel],
+          [`X[${i}]`, activations.X[i]],
+        ];
+        if (direction === "backward") rows.push([`∂L/∂X[${i}]`, number(gradients.X[i])]);
+      } else if (selectedLayer === 1) {
+        rows = [[`Z1[${i}]`, number(activations.Z1[i])], [`A1[${i}]`, number(activations.A1[i])]];
+        if (direction === "backward") {
+          rows.push([`∂L/∂A1[${i}]`, number(gradients.A1[i])], [`∂L/∂Z1[${i}]`, number(gradients.Z1[i])]);
+        }
+      } else {
+        const logit = activations.logits[i];
+        const probability = mineProbability(logit);
+        rows = [
+          ["棋盘位置", `第 ${Math.floor(i / 9) + 1} 行，第 ${i % 9 + 1} 列`],
+          [`logits[${i}]`, number(logit)],
+          ["预测雷概率", (probability * 100).toFixed(2) + "%"],
+          ["棋盘状态", unknown[i] ? "未知" : "已翻开"],
+        ];
+        if (direction === "backward") {
+          rows.push(["训练标签", mines[i] ? "1（雷）" : "0（安全）"], [`∂L/∂logits[${i}]`, number(gradients.logits[i])]);
+        }
+      }
+      if (layer.key && direction === "backward" && trace.gradient_norms[signalKey(layer)] !== undefined) {
+        rows.push(["整批梯度 L2", number(trace.gradient_norms[signalKey(layer)])]);
+      }
+      metrics.innerHTML = rows.map(([label, value]) => `<div><dt>${label}</dt><dd>${value}</dd></div>`).join("");
+      drawValues();
+    }
+
+    function renderNetwork() {
+      const trace = traces[currentStep - 1];
+      const layer = layers[selectedLayer];
+      layerButtons.forEach((button, index) => {
+        const item = layers[index];
+        button.setAttribute("aria-pressed", index === selectedLayer);
+        if (!item.key) {
+          button.querySelector(".node").textContent = direction === "forward" ? trace.loss.toFixed(4) : "1";
+          return;
+        }
+        const values = signalValues(item);
+        const first = trace.sample.example[item.example];
+        button.querySelectorAll(".node").forEach((dot, offset) => {
+          const i = (first + offset) % values.length;
+          dot.textContent = number(values[i]);
+          dot.title = `${direction === "forward" ? "" : "∂L/∂"}${signalKey(item)}[${i}]`;
+        });
+      });
+      const batchShape = layer.key ? trace.activations[layer.key].shape.join(" × ") : "";
+      layerTitle.textContent = layer.key ? `${layer.label} · 批次张量 ${batchShape}` : layer.label;
+      layerFormula.textContent = layer[direction];
+      connection.textContent = connectionExample(trace);
+      nextLayer.disabled = direction === "forward" ? !layer.key : selectedLayer === 0;
+      signals.hidden = !layer.key;
+      if (layer.key) {
+        unit.max = signalValues(layer).length - 1;
+        unit.value = selectedUnit;
+      }
+      renderUnit();
+      drawEdges();
+    }
+
+    function selectLayer(index) {
+      selectedLayer = index;
+      selectedUnit = traces[currentStep - 1].sample.example[layers[index].example] ?? 0;
+      renderNetwork();
+      const scroller = graph.parentElement;
+      const button = layerButtons[index];
+      if (scroller.scrollWidth > scroller.clientWidth) {
+        scroller.scrollLeft = button.offsetLeft + (button.offsetWidth - scroller.clientWidth) / 2;
+      }
+    }
+
+    function setDirection(nextDirection) {
+      direction = nextDirection;
+      network.dataset.direction = direction;
+      forward.setAttribute("aria-pressed", direction === "forward");
+      backward.setAttribute("aria-pressed", direction === "backward");
+      selectLayer(direction === "forward" ? 0 : layers.length - 1);
+    }
+
+    function renderUpdates(trace) {
+      const norm = value => value.toExponential(3);
+      updates.innerHTML = [[1, "隐藏层"], [2, "输出层"]].map(([layer, label]) => `<tr>
+        <th scope="row">${label}</th>
+        <td class="value">${norm(trace.parameter_gradient_norms[`W${layer}`])}</td>
+        <td class="value">${norm(trace.parameter_gradient_norms[`b${layer}`])}</td>
+        <td class="value">${norm(trace.update_norms[`W${layer}`])}</td>
+        <td class="value">${norm(trace.update_norms[`b${layer}`])}</td>
+        </tr>`).join("");
+    }
+
+    function drawLoss() {
+      const width = chart.clientWidth;
+      const height = chart.clientHeight;
+      if (!width || !height) return;
+      const ratio = window.devicePixelRatio || 1;
+      chart.width = Math.round(width * ratio);
+      chart.height = Math.round(height * ratio);
+      const ctx = chart.getContext("2d");
+      ctx.scale(ratio, ratio);
+      const left = 47, right = width - 12, top = 12, bottom = height - 22;
+      const low = minLoss - lossPadding, high = maxLoss + lossPadding;
+      const x = index => left + (right - left) * index / Math.max(losses.length - 1, 1);
+      const y = loss => top + (bottom - top) * (high - loss) / (high - low);
+      ctx.font = "11px system-ui, sans-serif";
+      ctx.fillStyle = "#526173";
+      ctx.strokeStyle = "#e1e7ee";
+      ctx.textBaseline = "middle";
+      for (const tick of [low, (low + high) / 2, high]) {
+        const position = y(tick);
+        ctx.beginPath();
+        ctx.moveTo(left, position);
+        ctx.lineTo(right, position);
+        ctx.stroke();
+        ctx.fillText(tick.toFixed(3), 4, position);
+      }
+      ctx.fillText("1", left, height - 10);
+      ctx.textAlign = "right";
+      ctx.fillText(String(losses.length), right, height - 10);
+      ctx.beginPath();
+      losses.forEach((loss, i) => {
+        if (i === 0) ctx.moveTo(x(i), y(loss));
+        else ctx.lineTo(x(i), y(loss));
+      });
+      ctx.strokeStyle = "#657a99";
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+      const cx = x(currentStep - 1), cy = y(losses[currentStep - 1]);
+      ctx.beginPath();
+      ctx.moveTo(cx, top);
+      ctx.lineTo(cx, bottom);
+      ctx.strokeStyle = "#2458bc";
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.arc(cx, cy, 4.5, 0, 2 * Math.PI);
+      ctx.fillStyle = "#2458bc";
+      ctx.fill();
+    }
+
+    function showStep(step) {
+      currentStep = Math.min(traces.length, Math.max(1, step));
+      slider.value = currentStep;
+      stepNumber.value = `${currentStep} / ${traces.length}`;
+      previous.disabled = currentStep === 1;
+      next.disabled = currentStep === traces.length;
+      const trace = traces[currentStep - 1];
+      lossValue.value = trace.loss.toFixed(5);
+      renderBoard(trace.sample);
+      renderNetwork();
+      renderUpdates(trace);
+      drawLoss();
+    }
+
+    function stopPlayback() {
+      window.clearInterval(timer);
+      timer = null;
+      play.textContent = "播放";
+    }
+
+    showMines.addEventListener("click", () => {
+      revealMines = !revealMines;
+      showMines.setAttribute("aria-pressed", revealMines);
+      showMines.textContent = revealMines ? "隐藏雷区答案" : "显示雷区答案";
+      renderBoard(traces[currentStep - 1].sample);
+    });
+    forward.addEventListener("click", () => setDirection("forward"));
+    backward.addEventListener("click", () => setDirection("backward"));
+    nextLayer.addEventListener("click", () => selectLayer(selectedLayer + (direction === "forward" ? 1 : -1)));
+    unit.addEventListener("input", () => {
+      if (unit.value !== "" && unit.validity.valid) {
+        selectedUnit = unit.valueAsNumber;
+        renderUnit();
+      }
+    });
+    unit.addEventListener("change", () => { unit.value = selectedUnit; });
+    valuesChart.addEventListener("click", event => {
+      const rect = valuesChart.getBoundingClientRect();
+      const size = signalValues(layers[selectedLayer]).length;
+      selectedUnit = Math.max(0, Math.min(size - 1, Math.floor((event.clientX - rect.left) / rect.width * size)));
+      unit.value = selectedUnit;
+      renderUnit();
+    });
+    slider.addEventListener("input", () => showStep(Number(slider.value)));
+    previous.addEventListener("click", () => showStep(currentStep - 1));
+    next.addEventListener("click", () => showStep(currentStep + 1));
+    play.addEventListener("click", () => {
+      if (timer !== null) {
+        stopPlayback();
+        return;
+      }
+      if (currentStep === traces.length) showStep(1);
+      play.textContent = "暂停";
+      timer = window.setInterval(() => {
+        showStep(currentStep + 1);
+        if (currentStep === traces.length) stopPlayback();
+      }, 550);
+    });
+    new ResizeObserver(drawLoss).observe(chart);
+    new ResizeObserver(drawEdges).observe(graph);
+    new ResizeObserver(drawValues).observe(valuesChart);
+    showStep(1);
+  }
+
+  const guide = document.getElementById("replay-guide");
+  const replay = document.getElementById("replay");
+  try {
+    const traces = JSON.parse(document.getElementById("trace-data").textContent);
+    if (traces.length) {
+      replay.hidden = false;
+      startReplay(traces);
+      guide.hidden = true;
+    }
+  } catch (error) {
+    replay.hidden = true;
+    document.getElementById("replay-guide-message").textContent = "训练回放加载失败。请重新打开生成的回放文件。";
+    console.error(error);
+  }
+  </script>
+</body>
+</html>

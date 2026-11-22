@@ -1,0 +1,72 @@
+{
+  "source": "minesweeper_comparison_lr0.00005_checkpoint.npz",
+  "start": 2370000,
+  "end": 2670000,
+  "learning_rate": 5e-05,
+  "cpu_threads": 12,
+  "evaluation_interval": 50000,
+  "original_board_seed": 2026,
+  "original_board_spawn_index": 2,
+  "second_board_seed": 207237,
+  "fresh_per_batch": 16,
+  "replay_per_batch": 10,
+  "priority_per_batch": 6,
+  "self_play_interval": 100,
+  "games_per_round": 64,
+  "checkpoints": [
+    {
+      "wins": 735,
+      "games": 1000,
+      "win_rate": 0.735,
+      "mean_safe_revealed": 58.61,
+      "failure_diagnostics": {
+        "safe_move_available": 73,
+        "selected_provable_mine": 36,
+        "failed_games": 265
+      },
+      "updates": 2370000,
+      "failed_training_games": 323631,
+      "replay_states": 2906868,
+      "priority_cases": 24283,
+      "second": {
+        "wins": 746,
+        "games": 1000,
+        "win_rate": 0.746,
+        "mean_safe_revealed": 59.852,
+        "failure_diagnostics": {
+          "safe_move_available": 84,
+          "selected_provable_mine": 37,
+          "failed_games": 254
+        }
+      },
+      "combined_wins": 1481
+    }
+  ],
+  "best": {
+    "wins": 735,
+    "games": 1000,
+    "win_rate": 0.735,
+    "mean_safe_revealed": 58.61,
+    "failure_diagnostics": {
+      "safe_move_available": 73,
+      "selected_provable_mine": 36,
+      "failed_games": 265
+    },
+    "updates": 2370000,
+    "failed_training_games": 323631,
+    "replay_states": 2906868,
+    "priority_cases": 24283,
+    "second": {
+      "wins": 746,
+      "games": 1000,
+      "win_rate": 0.746,
+      "mean_safe_revealed": 59.852,
+      "failure_diagnostics": {
+        "safe_move_available": 84,
+        "selected_provable_mine": 37,
+        "failed_games": 254
+      }
+    },
+    "combined_wins": 1481
+  }
+}
